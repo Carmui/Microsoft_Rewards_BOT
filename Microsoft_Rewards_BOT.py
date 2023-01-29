@@ -98,7 +98,7 @@ password: {password}
     print(Fore.WHITE + f'{email} status: ', Fore.GREEN + 'Logged-in!')
 
     # Additional login check
-    if check_logging() is True:
+    if check_logging(browser) is True:
         color = Fore.GREEN
         result = 'Logged-in!'
     else:
@@ -108,9 +108,30 @@ password: {password}
     print(Fore.WHITE + 'Additional check status:', color + result)
 
 
-def check_logging() -> bool:
+def check_logging(browser: webdriver.Chrome, ) -> bool:
     """ Checking if user is currently logged """
-    return True
+    # We are going to check logs in 2 different ways (2 different websites)
+    current_url = browser.current_url
+    time.sleep(2)
+
+    # Cookies accept - else way pass
+    try:
+        browser.find_element(By.XPATH, '//*[@id="cookie-banner"]/div/div[2]/button[1]').click()
+    except:
+        pass
+
+
+    if current_url.split('?')[0] == 'https://account.microsoft.com/':
+        print('xd')
+        return True
+    elif current_url == 'https://bing.com/':
+        print('xp')
+        return True
+    else:
+        print('wat')
+        return True
+
+
 
 
 def is_element_Presence(browser: webdriver.Chrome, by: By, selector: str, delay: int):
@@ -197,4 +218,6 @@ if __name__ == "__main__":
 
         # Login to the server with the first account
         login(chrome_browser, account["email"], account["password"])
+
+        time.sleep(15)
         close_phase(chrome_browser)
