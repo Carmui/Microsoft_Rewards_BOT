@@ -18,9 +18,14 @@ class LoginException(Exception):
     pass
 
 
+class WrongWebsitePathException(Exception):
+    """ Raised when program do not recognise given links (bing, microsoft) """
+    pass
+
 # ---------------------------------- VARIABLES/CHROME OPTIONS CONIFG  ---------------------------------- #
 
 BASE_URL = ""
+STARTING_POINTS = 0
 BASE_EMAIL = "EXAMPLE_EMAIL"
 BASE_PASSWORD = "EXAMPLE_PASSWORD"
 ACCOUNTS = []
@@ -47,7 +52,7 @@ def login(browser: webdriver.Chrome, email: str, password: str):
     print(Fore.CYAN + f""" 
 Login procedure for incoming account details:
 email: {email}
-password: {password}
+password: {len(password)*'*'}
           """)
 
     # Getting access to the login website
@@ -80,7 +85,6 @@ password: {password}
     except NoSuchElementException:
         raise LoginException("Can't find checkbox field - probably user delivered wrong account details.")
 
-
     # Trying to click next and finally log in :)
     try:
         browser.find_element(By.ID, 'idSIButton9').click()
@@ -98,7 +102,7 @@ password: {password}
     print(Fore.WHITE + f'{email} status: ', Fore.GREEN + 'Logged-in!')
 
     # Additional login check
-    if check_logging(browser) is True:
+    if check_logging(browser, email) is True:
         color = Fore.GREEN
         result = 'Logged-in!'
     else:
@@ -108,30 +112,51 @@ password: {password}
     print(Fore.WHITE + 'Additional check status:', color + result)
 
 
-def check_logging(browser: webdriver.Chrome, ) -> bool:
-    """ Checking if user is currently logged """
+def check_logging(browser: webdriver.Chrome, email: str) -> bool:
+    """ Checking if user is currently logged / If logged and on the bing site -> set user points value """
     # We are going to check logs in 2 different ways (2 different websites)
+    global STARTING_POINTS
     current_url = browser.current_url
     time.sleep(2)
 
-    # Cookies accept - else way pass
-    try:
-        browser.find_element(By.XPATH, '//*[@id="cookie-banner"]/div/div[2]/button[1]').click()
-    except:
-        pass
-
-
+    # ---------- Checking 2 sites log in / if on the bing site - getting proper score value  ---------- #
+    # MICROSOFT SITE LOG CHECK
     if current_url.split('?')[0] == 'https://account.microsoft.com/':
-        print('xd')
+        # Cookies accept - else way pass
+        try:
+            browser.find_element(By.XPATH, '//*[@id="cookie-banner"]/div/div[2]/button[1]').click()
+        except:
+            pass
+
+        time.sleep(2)
+
+        try:
+            return False if email != browser.find_element(By.XPATH, '//*[@id="main-content-landing-react"]/div[2]/div/div[1]/div/div[1]/div/div/div/div[2]/a[2]/span').text else True
+        except NoSuchElementException:
+            raise NoSuchElementException("This button doesn't exist. Please open the issue ticket.    |    URL: https://github.com/Carmui/Microsoft_Rewards_BOT/issues")
+
+    # BING SITE LOG CHECK + SETTING POINTS VALUE
+    elif current_url.split('?')[0] == 'https://www.bing.com/':
+        # Cookies accept - else way pass
+        try:
+            browser.find_element(By.ID, 'bnp_btn_accept').click()
+        except:
+            pass
+
+        time.sleep(2)
+
+        try:
+            STARTING_POINTS = int(browser.find_element(By.ID, 'id_rc').text)
+            print(Fore.WHITE + 'Your current points:', Fore.GREEN + str(STARTING_POINTS))
+            return True
+        except NoSuchElementException:
+            raise NoSuchElementException("This button doesn't exist. Please open the issue ticket.    |    URL: https://github.com/Carmui/Microsoft_Rewards_BOT/issues")
         return True
-    elif current_url == 'https://bing.com/':
-        print('xp')
-        return True
+
+    # RAISE EXCEPTION IF ANY OF SITES ABOVE DOESN'T WORK
     else:
-        print('wat')
-        return True
-
-
+        raise WrongWebsitePathException("Couldn't get to the bing/microsoft site. Try again later.")
+    # ------------------------------ END OF THE IF STATEMENT ----------------------------------------- #
 
 
 def is_element_Presence(browser: webdriver.Chrome, by: By, selector: str, delay: int):
@@ -218,6 +243,11 @@ if __name__ == "__main__":
 
         # Login to the server with the first account
         login(chrome_browser, account["email"], account["password"])
+        chrome_browser.get("https://bing.com/")
+        time.sleep(2)
+        chrome_browser.get("https://bing.com/")
+        time.sleep(2)
+        check_logging(chrome_browser, account["email"])
 
         time.sleep(15)
         close_phase(chrome_browser)
