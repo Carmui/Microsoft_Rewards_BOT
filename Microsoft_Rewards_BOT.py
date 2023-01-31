@@ -1,6 +1,8 @@
 import time
 import os
 import json
+import requests
+from random import choice, randint
 from colorama import Fore, Back, Style
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -25,7 +27,11 @@ class WrongWebsitePathException(Exception):
 # ---------------------------------- VARIABLES/CHROME OPTIONS CONIFG  ---------------------------------- #
 
 BASE_URL = ""
+WORD_SITE = "https://www.mit.edu/~ecprice/wordlist.10000"
 STARTING_POINTS = 0
+POINTS_EARNED = 0
+CLICKS_DONE = 0
+SEARCHES_DONE = 0
 BASE_EMAIL = "EXAMPLE_EMAIL"
 BASE_PASSWORD = "EXAMPLE_PASSWORD"
 ACCOUNTS = []
@@ -53,7 +59,7 @@ def login(browser: webdriver.Chrome, email: str, password: str):
 Login procedure for incoming account details:
 email: {email}
 password: {len(password)*'*'}
-          """)
+""")
 
     # Getting access to the login website
     browser.get('https://login.live.com/')
@@ -146,11 +152,10 @@ def check_logging(browser: webdriver.Chrome, email: str) -> bool:
         time.sleep(2)
 
         try:
-            STARTING_POINTS = int(browser.find_element(By.ID, 'id_rc').text)
-            print(Fore.WHITE + 'Your current points:', Fore.GREEN + str(STARTING_POINTS))
-            return True
+            STARTING_POINTS = get_current_points(browser, 'current')
         except NoSuchElementException:
             raise NoSuchElementException("This button doesn't exist. Please open the issue ticket.    |    URL: https://github.com/Carmui/Microsoft_Rewards_BOT/issues")
+
         return True
 
     # RAISE EXCEPTION IF ANY OF SITES ABOVE DOESN'T WORK
@@ -169,6 +174,15 @@ def is_element_Clickable(browser: webdriver.Chrome, by: By, selector: str, delay
     """ Function dedicated to wait until element become clickable """
     wait = WebDriverWait(browser, delay)
     wait.until(EC.element_to_be_clickable((by, selector)))
+
+
+def get_current_points(browser: webdriver.Chrome, text: str) -> int:
+    """ Function dedicated to return current user points (must be on the bing site) """
+    browser.get("https://www.bing.com/")
+    time.sleep(2)
+    points = int(browser.find_element(By.ID, 'id_rc').text)
+    print(Fore.WHITE + f'Your {text} points:', Fore.GREEN + str(points))
+    return points
 
 
 def get_accounts(file_path: str) -> dict:
@@ -192,7 +206,6 @@ def get_accounts(file_path: str) -> dict:
             }
             ], indent=5))
 
-
         print("""
 [BOT] New file was created. Please update account details to proceed.
 [BOT] If you want to add more accounts -> follow the structure created in the file. New accounts need to be separeted with a comma.
@@ -201,21 +214,67 @@ def get_accounts(file_path: str) -> dict:
 
     return accounts
 
+
+def randomize_word(WORD_LIST_SITE: str) -> str:
+    """ Function to optimize search method using random word generator """
+    response = requests.get(WORD_LIST_SITE)
+    words = response.text.split('\n')
+    # getting list of words with > 3 letters
+    final_list = [word for word in words if len(word) > 3]
+
+    result = choice(final_list)
+    return result
+
+
 def BOT_clickable_elements():
     """ Function dedicated to automate clicking process to earn points from Microsoft Rewards """
     pass
 
 
-def BOT_writing_elements():
+def BOT_writing_elements(browser: webdriver.Chrome):
     """ Function dedicated to automate writing process to earn points from Microsoft Rewards """
-    pass
+    global SEARCHES_DONE
+
+    # Short sleep until we start
+    time.sleep(1)
+
+    # Getting to the bing site
+    browser.get("https://bing.com/")
+    time.sleep(2)
+
+
+    # Refreshing it to get proper user values
+    #browser.get("https://bing.com/")
+    #time.sleep(2)
+
+    # Check if users is logged properly
+    check_logging(chrome_browser, account["email"])
+    print(Fore.LIGHTRED_EX + """
+----------------------------------------------Searching BOT PHASE-------------------------------------------------------       
+""")
+
+    # Randomize words and write it to the search (6 times is the actual maximum of searches)
+    for i in range(1):
+        SEARCHES_DONE += 1
+        time.sleep(2)
+        word_to_write = randomize_word(WORD_SITE)
+        print("Searching '", word_to_write, "' ... in bing.")
+        try:
+            is_element_Presence(browser, By.ID, 'sb_form_q', 5)
+            search = browser.find_element(By.ID, 'sb_form_q')
+            search.send_keys(word_to_write)
+            search.submit()
+        except NoSuchElementException:
+            raise NoSuchElementException("This button doesn't exist. Please open the issue ticket.    |    URL: https://github.com/Carmui/Microsoft_Rewards_BOT/issues")
+        time.sleep(randint(3, 7))
+        browser.get("https://bing.com/")
 
 
 def close_phase(browser: webdriver.Chrome):
     """ Function dedicated to close the BOT process. """
     print(Fore.MAGENTA + """
 Work done. Quitting automation procedure.   
---------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------
     """)
     browser.quit()
 
@@ -224,17 +283,14 @@ Work done. Quitting automation procedure.
 
 if __name__ == "__main__":
     print(Fore.CYAN + """
-                                ╔═╗╔═╗                      ╔═╗ ╔╗     ╔═══╗╔═══╗╔╗╔╗╔╗╔═══╗╔═══╗╔═══╗╔═══╗    ╔══╗ ╔═══╗╔════╗
-                                ║║╚╝║║                      ║╔╝╔╝╚╗    ║╔═╗║║╔══╝║║║║║║║╔═╗║║╔═╗║╚╗╔╗║║╔═╗║    ║╔╗║ ║╔═╗║║╔╗╔╗║
-                                ║╔╗╔╗║╔╗╔══╗╔═╗╔══╗╔══╗╔══╗╔╝╚╗╚╗╔╝    ║╚═╝║║╚══╗║║║║║║║║ ║║║╚═╝║ ║║║║║╚══╗    ║╚╝╚╗║║ ║║╚╝║║╚╝
-                                ║║║║║║╠╣║╔═╝║╔╝║╔╗║║══╣║╔╗║╚╗╔╝ ║║     ║╔╗╔╝║╔══╝║╚╝╚╝║║╚═╝║║╔╗╔╝ ║║║║╚══╗║    ║╔═╗║║║ ║║  ║║  
-                                ║║║║║║║║║╚═╗║║ ║╚╝║╠══║║╚╝║ ║║  ║╚╗    ║║║╚╗║╚══╗╚╗╔╗╔╝║╔═╗║║║║╚╗╔╝╚╝║║╚═╝║    ║╚═╝║║╚═╝║ ╔╝╚╗ 
-                                ╚╝╚╝╚╝╚╝╚══╝╚╝ ╚══╝╚══╝╚══╝ ╚╝  ╚═╝    ╚╝╚═╝╚═══╝ ╚╝╚╝ ╚╝ ╚╝╚╝╚═╝╚═══╝╚═══╝    ╚═══╝╚═══╝ ╚══╝ 
-                                                                 by Mateusz Michalowski (@carmui)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+             █▄ ▄█ █ ▄▀▀ █▀▄ ▄▀▄ ▄▀▀ ▄▀▄ █▀ ▀█▀     █▀▄ ██▀ █   █ ▄▀▄ █▀▄ █▀▄ ▄▀▀     ██▄ ▄▀▄ ▀█▀
+             █ ▀ █ █ ▀▄▄ █▀▄ ▀▄▀ ▄██ ▀▄▀ █▀  █      █▀▄ █▄▄ ▀▄▀▄▀ █▀█ █▀▄ █▄▀ ▄██     █▄█ ▀▄▀  █ 
+                                      by Mateusz Michalowski (@carmui)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
     """)
 
     # Getting accounts json path
-    accounts_path = os.path.dirname(os.path.abspath(__file__)) + '/accounts.json'
+    accounts_path = os.getcwd() + '/accounts.json'
+
     ACCOUNTS = get_accounts(accounts_path)
 
     for account in ACCOUNTS:
@@ -243,11 +299,19 @@ if __name__ == "__main__":
 
         # Login to the server with the first account
         login(chrome_browser, account["email"], account["password"])
-        chrome_browser.get("https://bing.com/")
-        time.sleep(2)
-        chrome_browser.get("https://bing.com/")
-        time.sleep(2)
-        check_logging(chrome_browser, account["email"])
 
-        time.sleep(15)
+        # BOT writing elements in the bing search
+        BOT_writing_elements(chrome_browser)
+
+        # BOT clickable elements on the main site
+
+        print(Fore.MAGENTA + "\n------------------! Ending Statistics !------------------")
+        # Ending statistics
+        POINTS_EARNED = get_current_points(chrome_browser, 'final') - STARTING_POINTS
+        print("Searches done: ", SEARCHES_DONE)
+        print("Clicks done: ", CLICKS_DONE)
+        print("Points earned: ", POINTS_EARNED)
+
+        time.sleep(2)
+
         close_phase(chrome_browser)
