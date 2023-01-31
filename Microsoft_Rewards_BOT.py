@@ -122,6 +122,7 @@ def check_logging(browser: webdriver.Chrome, email: str) -> bool:
     """ Checking if user is currently logged / If logged and on the bing site -> set user points value """
     # We are going to check logs in 2 different ways (2 different websites)
     global STARTING_POINTS
+    STARTING_POINTS = 0
     current_url = browser.current_url
     time.sleep(2)
 
@@ -226,9 +227,27 @@ def randomize_word(WORD_LIST_SITE: str) -> str:
     return result
 
 
-def BOT_clickable_elements():
+def BOT_clickable_elements(browser: webdriver.Chrome):
     """ Function dedicated to automate clicking process to earn points from Microsoft Rewards """
-    pass
+    global CLICKS_DONE
+    CLICKS_DONE = 0
+
+    print(Fore.LIGHTMAGENTA_EX + """
+----------------------------------------------CLICKING BOT PHASE-------------------------------------------------------       
+""")
+
+    # Short sleep until we start
+    time.sleep(1)
+    browser.get("https://rewards.bing.com/")
+
+    # Get activities elements
+    activities = browser.find_element(By.XPATH, '//*[@id="more-activities"]/div').find_elements(By.CSS_SELECTOR, 'mee-card')
+    for activity in activities:
+        CLICKS_DONE += 1
+        print(Fore.LIGHTMAGENTA_EX + f"{CLICKS_DONE} click done.")
+        activity.click()
+        time.sleep(randint(3, 5))
+
 
 
 def BOT_writing_elements(browser: webdriver.Chrome):
@@ -254,7 +273,7 @@ def BOT_writing_elements(browser: webdriver.Chrome):
 """)
 
     # Randomize words and write it to the search (6 times is the actual maximum of searches)
-    for i in range(1):
+    for i in range(8):
         SEARCHES_DONE += 1
         time.sleep(2)
         word_to_write = randomize_word(WORD_SITE)
@@ -266,7 +285,7 @@ def BOT_writing_elements(browser: webdriver.Chrome):
             search.submit()
         except NoSuchElementException:
             raise NoSuchElementException("This button doesn't exist. Please open the issue ticket.    |    URL: https://github.com/Carmui/Microsoft_Rewards_BOT/issues")
-        time.sleep(randint(3, 7))
+        time.sleep(randint(3, 5))
         browser.get("https://bing.com/")
 
 
@@ -302,8 +321,16 @@ if __name__ == "__main__":
 
         # BOT writing elements in the bing search
         BOT_writing_elements(chrome_browser)
+        print(Fore.LIGHTRED_EX + """
+------------------------------------------END OF SEARCHING BOT PHASE----------------------------------------------------      
+""")
 
         # BOT clickable elements on the main site
+        BOT_clickable_elements(chrome_browser)
+
+        print(Fore.LIGHTMAGENTA_EX + """
+----------------------------------------------END OF BOT PHASE----------------------------------------------------------      
+""")
 
         print(Fore.MAGENTA + "\n------------------! Ending Statistics !------------------")
         # Ending statistics
