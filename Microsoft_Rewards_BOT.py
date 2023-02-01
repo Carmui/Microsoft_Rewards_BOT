@@ -122,7 +122,6 @@ def check_logging(browser: webdriver.Chrome, email: str) -> bool:
     """ Checking if user is currently logged / If logged and on the bing site -> set user points value """
     # We are going to check logs in 2 different ways (2 different websites)
     global STARTING_POINTS
-    STARTING_POINTS = 0
     current_url = browser.current_url
     time.sleep(2)
 
@@ -246,14 +245,14 @@ def BOT_clickable_elements(browser: webdriver.Chrome):
         CLICKS_DONE += 1
         print(Fore.LIGHTMAGENTA_EX + f"{CLICKS_DONE} click done.")
         activity.click()
-        time.sleep(randint(3, 5))
+        time.sleep(randint(5, 7))
 
 
 
 def BOT_writing_elements(browser: webdriver.Chrome):
     """ Function dedicated to automate writing process to earn points from Microsoft Rewards """
     global SEARCHES_DONE
-
+    SEARCHES_DONE = 0
     # Short sleep until we start
     time.sleep(1)
 
@@ -285,7 +284,7 @@ def BOT_writing_elements(browser: webdriver.Chrome):
             search.submit()
         except NoSuchElementException:
             raise NoSuchElementException("This button doesn't exist. Please open the issue ticket.    |    URL: https://github.com/Carmui/Microsoft_Rewards_BOT/issues")
-        time.sleep(randint(3, 5))
+        time.sleep(randint(5, 7))
         browser.get("https://bing.com/")
 
 
