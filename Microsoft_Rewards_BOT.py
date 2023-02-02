@@ -239,6 +239,8 @@ def BOT_clickable_elements(browser: webdriver.Chrome):
     time.sleep(1)
     browser.get("https://rewards.bing.com/")
 
+    # Might be a problem with popping up window (?)
+
     # Get activities elements
     activities = browser.find_element(By.XPATH, '//*[@id="more-activities"]/div').find_elements(By.CSS_SELECTOR, 'mee-card')
     for activity in activities:
@@ -246,6 +248,9 @@ def BOT_clickable_elements(browser: webdriver.Chrome):
         print(Fore.LIGHTMAGENTA_EX + f"{CLICKS_DONE} click done.")
         activity.click()
         time.sleep(randint(5, 7))
+        browser.switch_to.window(window_name=browser.window_handles[0])
+        time.sleep(randint(3, 5))
+
 
 
 
@@ -262,8 +267,8 @@ def BOT_writing_elements(browser: webdriver.Chrome):
 
 
     # Refreshing it to get proper user values
-    #browser.get("https://bing.com/")
-    #time.sleep(2)
+    browser.get("https://bing.com/")
+    time.sleep(2)
 
     # Check if users is logged properly
     check_logging(chrome_browser, account["email"])
