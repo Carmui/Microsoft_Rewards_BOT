@@ -1,6 +1,6 @@
 ```
-                      █▄ ▄█ █ ▄▀▀ █▀▄ ▄▀▄ ▄▀▀ ▄▀▄ █▀ ▀█▀     █▀▄ ██▀ █   █ ▄▀▄ █▀▄ █▀▄ ▄▀▀     ██▄ ▄▀▄ ▀█▀
-                      █ ▀ █ █ ▀▄▄ █▀▄ ▀▄▀ ▄██ ▀▄▀ █▀  █      █▀▄ █▄▄ ▀▄▀▄▀ █▀█ █▀▄ █▄▀ ▄██     █▄█ ▀▄▀  █ 
+              █▄ ▄█ █ ▄▀▀ █▀▄ ▄▀▄ ▄▀▀ ▄▀▄ █▀ ▀█▀     █▀▄ ██▀ █   █ ▄▀▄ █▀▄ █▀▄ ▄▀▀     ██▄ ▄▀▄ ▀█▀
+              █ ▀ █ █ ▀▄▄ █▀▄ ▀▄▀ ▄██ ▀▄▀ █▀  █      █▀▄ █▄▄ ▀▄▀▄▀ █▀█ █▀▄ █▄▀ ▄██     █▄█ ▀▄▀  █ 
 ```
 
 > <p align="center"> The program was created for learning purposes. Possible users should be aware that using this bot may result in a ban. </p>
@@ -29,6 +29,8 @@ add instructions here
       Colorama:             pip install colorama
       Selenium:             pip install selenium
       Webdriver_manager:    pip install webdriver-manager
+      Requests:             pip install requests     
+      Pyinstaller           pip install pyinstaller (if you want to do .exe yourself)
   ``` 
   <li> PyCharm IDLE recommended but not necessary. </li>
   
@@ -40,12 +42,16 @@ add instructions here
 
 <h3 align="left"> 1. Create Microsoft account and make sure you have taken part in rewards programme. </h3>
 
-add screens here
+![MRP 1 screen](/scr/scr_1.png?raw=true "SCR_1")
 
-<h3 align="left"> 2. Change the accounts.json with your accounts credentials. (If you can't find the file -> start the program, afterwards the file should be created in the same folder as script.</h3>
 
-add screens here
+<h3 align="left"> 2. Do the first clicking by yourself. </h3>
 
-<h3 align="left"> 3. Run the script.</h3>
+![MRP 2 screen](/scr/scr_2.png?raw=true "SCR_2")
 
-add screens here
+<h3 align="left"> 3. Change the accounts.json with your accounts credentials. (If you can't find the file -> start the program, afterwards the file should be created in the same folder as script.</h3>
+
+![MRP 3 screen](/scr/scr_3.png?raw=true "SCR_3")
+
+<h3 align="left"> 4. Run the script everyday and earn points!</h3>
+
