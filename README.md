@@ -15,9 +15,8 @@
 ## <p align="center"> Installation </p>
 
 <h3 align="left"> I. Executable file </h3>
-</br>
 
-add instructions here
+You can download it [here](https://mega.nz/file/c7ZxSSAQ#4buxMLQG5ZjWYKJgQ31jckCste9ja9H5mcwGPFulZgo).
 
 <h3 align="left"> II. Python script </h3>
 <ul>
